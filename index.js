@@ -3,6 +3,9 @@ const cors = require('cors');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+const jwt = require('jsonwebtoken');
+
+
 app.use(cors());
 app.use(express.json());
 
@@ -107,11 +110,16 @@ app.post('/login', (req, res) => {
     return res.status(401).json({ error: 'Credenciais inválidas' });
   }
 
-  // Aqui, em app real, você geraria um JWT
-  const token = "meu-token-supersecreto";
+  // Cria token real (JWT)
+  const token = jwt.sign(
+    { id: user.id, email: user.email }, 
+    'secreto-super-ultra',  // chave secreta (pode ser qualquer string)
+    { expiresIn: '1h' }     // tempo de expiração (opcional)
+  );
 
   res.json({ token });
 });
+
 
 
 // Rota padrão
