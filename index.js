@@ -6,10 +6,13 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
+
 let users = [
-  { id: 1, nome: 'João', email: 'joao@email.com' },
-  { id: 2, nome: 'Maria', email: 'maria@email.com' }
+  { id: 1, nome: 'João', email: 'joao@email.com', senha: '123456' },
+  { id: 2, nome: 'Maria', email: 'maria@email.com', senha: 'abcdef' }
 ];
+
+
 
 // GET all users
 app.get('/users', (req, res) => {
@@ -62,11 +65,13 @@ app.post('/users', (req, res) => {
   const novoUser = {
     id: Date.now(),
     nome: req.body.nome,
-    email: req.body.email
+    email: req.body.email,
+    senha: req.body.senha
   };
   users.push(novoUser);
   res.status(201).json(novoUser);
 });
+
 
 // PUT edit user
 app.put('/users/:id', (req, res) => {
@@ -87,6 +92,28 @@ app.delete('/users/:id', (req, res) => {
   res.status(204).send();
 });
 
+
+// POST login
+app.post('/login', (req, res) => {
+  const { email, senha } = req.body;
+
+  if (!email || !senha) {
+    return res.status(400).json({ error: 'Email e senha são obrigatórios' });
+  }
+
+  const user = users.find(u => u.email === email && u.senha === senha);
+
+  if (!user) {
+    return res.status(401).json({ error: 'Credenciais inválidas' });
+  }
+
+  // Aqui, em app real, você geraria um JWT
+  const token = "meu-token-supersecreto";
+
+  res.json({ token });
+});
+
+
 // Rota padrão
 app.get('/', (req, res) => {
   res.send('API de Usuários está no ar!');
@@ -95,3 +122,5 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
   console.log(`✅ API rodando em http://localhost:${PORT}`);
 });
+
+
